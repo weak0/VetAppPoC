@@ -1,11 +1,13 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using App;
 using BusinessLayer;
+using Coravel;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Notification;
 using Notification.NotificationType;
-
-Console.WriteLine("hello world");
 
 var user = new User
 {
@@ -35,9 +37,27 @@ var msgS = new Message
     NotificationType = NotificationTypeEnum.Sms
 };
 
-var list = new List<Message> {msgE, msgS};
+// var list = new List<Message> {msgE, msgS};
+//
+// foreach (var message in list)
+// {
+//     sender.Send(message);
+// }
 
-foreach (var message in list)
+var builder = Host.CreateApplicationBuilder();
+
+builder.Services.AddScheduler();
+builder.Services.AddScoped<MyRepeatableTask>();
+builder.Services.AddSingleton<DbMock>();
+builder.Services.AddSingleton<ISender, Sender>(_ => new Sender(config));
+
+
+var app = builder.Build();
+app.Services.GetRequiredService<DbMock>().Messages = new List<Message>() {msgE, msgS};
+
+app.Services.UseScheduler(scheduler =>
 {
-    sender.Send(message);
-}
+    scheduler.Schedule<MyRepeatableTask>().EverySeconds(5);
+});
+
+app.Run();

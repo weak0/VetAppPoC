@@ -9,7 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="Coravel" Version="5.0.4" />
       <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="9.0.0-preview.6.24327.7" />
+      <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0-preview.6.24327.7" />
     </ItemGroup>
 
     <ItemGroup>
